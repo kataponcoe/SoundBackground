@@ -8,9 +8,6 @@ import android.database.sqlite.SQLiteStatement;
 
 import java.sql.SQLException;
 
-/**
- * Created by adri on 12/31/15.
- */
 public class DBAdapter
 {
     private static final String DB_NAME = "mataharimall_db";
