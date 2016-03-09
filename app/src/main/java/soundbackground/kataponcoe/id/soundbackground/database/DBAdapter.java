@@ -10,8 +10,8 @@ import java.sql.SQLException;
 
 public class DBAdapter
 {
-    private static final String DB_NAME = "mataharimall_db";
-    private static final String TABLE_CATEGORY = "category";
+    private static final String DB_NAME = "databases_db";
+    private static final String TABLE_USER = "user";
 
     private Context ctx;
     private DatabaseHelper DBHelper;
@@ -26,7 +26,7 @@ public class DBAdapter
     private static class DatabaseHelper extends SQLiteOpenHelper
     {
 
-        private final String CREATE_TABLE_CATEGORY = "CREATE TABLE category (json_data text)";
+        private final String CREATE_TABLE_CATEGORY = "CREATE TABLE user (user text, password text)";
         private final String DROP_TABLE_IF_EXISTS = "DROP TABLE IF EXISTS ";
 
         public DatabaseHelper(Context context)
@@ -43,7 +43,7 @@ public class DBAdapter
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
         {
-            db.execSQL(DROP_TABLE_IF_EXISTS + TABLE_CATEGORY);
+            db.execSQL(DROP_TABLE_IF_EXISTS + TABLE_USER);
             onCreate(db);
         }
     }
@@ -60,15 +60,16 @@ public class DBAdapter
             DBHelper.close();
     }
 
-    public void insertCategory(String jsonCategory)
+    public void insertCategory(String username, String password)
     {
-        String sql = "INSERT INTO " + TABLE_CATEGORY + " VALUES (?);";
+        String sql = "INSERT INTO " + TABLE_USER + " VALUES (?);";
         SQLiteStatement statement = db.compileStatement(sql);
         db.beginTransaction();
 
         statement.clearBindings();
 
-        statement.bindString(1, jsonCategory);
+        statement.bindString(1, username);
+        statement.bindString(2, password);
 
         statement.execute();
 
@@ -76,20 +77,24 @@ public class DBAdapter
         db.endTransaction();
     }
 
-    public Cursor retriveCategory()
+    public Cursor retriveUser(String user, String password)
     {
-        Cursor cursor = db.rawQuery("SELECT json_data FROM " + TABLE_CATEGORY, null);
+        Cursor cursor = db.rawQuery("SELECT user WHERE user='" + user + "' AND password='" + password + "' FROM " + TABLE_USER, null);
         return cursor;
     }
 
-    private void getCategory()
+    private String getUser(String user, String password)
     {
-        Cursor mdl = retriveCategory();
+        Cursor mdl = retriveUser(user, password);
+
+        String userName = null;
 
         for (mdl.moveToFirst(); !mdl.isAfterLast(); mdl.moveToNext())
         {
-            String foo = mdl.getString(0);
+            userName = mdl.getString(0);
         }
+
+        return userName != null ? userName : "";
     }
 
 }
